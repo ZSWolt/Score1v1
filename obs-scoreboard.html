@@ -3,151 +3,163 @@
 <head>
 <meta charset="utf-8">
 <title>Scoreboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@700;800;900&family=Rubik:ital,wght@1,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,800;1,800&family=Heebo:wght@800;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --red: #ff2d55;
-    --red-soft: #ff6b81;
-    --blue: #1e90ff;
-    --blue-soft: #6fd3ff;
-    --gold: #f5c542;
-    --panel: #14161f;
+    --red: #e5383b;
+    --red-dark: #b3202a;
+    --blue: #2f6fed;
+    --blue-dark: #1c4fc0;
+    --gold: #f0b93a;
+    --plate: #16181e;
+    --plate-2: #1e2129;
+    --ink: #0c0d11;
+    --muted: #8e93a3;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: transparent; overflow: hidden; user-select: none; }
   body {
-    font-family: "Heebo", sans-serif;
+    font-family: "Barlow Condensed", "Heebo", sans-serif;
     display: flex;
     justify-content: center;
-    padding-top: 20px;
+    padding: 20px 0 40px;
   }
 
   .board {
-    position: relative;
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 1fr 210px 1fr;
+    align-items: start;
     width: 1500px;
-    height: 170px;
+    filter: drop-shadow(0 10px 22px rgba(0, 0, 0, .45));
   }
 
-  /* ---------- side panels ---------- */
-  .side {
-    position: relative;
-    flex: 1;
-    height: 130px;
+  /* ---------- teams ---------- */
+  .team {
     display: flex;
-    align-items: center;
-    padding: 0 40px;
-    background: linear-gradient(180deg, #1c1f2b 0%, var(--panel) 100%);
-    border-radius: 16px;
+    height: 100px;
     cursor: pointer;
   }
-  .side.red {
-    border: 3px solid var(--red);
-    box-shadow: 0 0 18px rgba(255, 45, 85, .55), inset 0 0 30px rgba(255, 45, 85, .18);
-    padding-right: 150px;
-  }
-  .side.blue {
-    border: 3px solid var(--blue);
-    box-shadow: 0 0 18px rgba(30, 144, 255, .55), inset 0 0 30px rgba(30, 144, 255, .18);
-    padding-left: 150px;
-    flex-direction: row-reverse;
-  }
+  .team.red  { clip-path: polygon(34px 0, 100% 0, 100% 100%, 0 100%); }
+  .team.blue { clip-path: polygon(0 0, calc(100% - 34px) 0, 100% 100%, 0 100%); flex-direction: row-reverse; }
 
   .score {
-    font-family: "Heebo", sans-serif;
-    font-weight: 900;
-    font-size: 104px;
+    position: relative;
+    width: 170px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    color: #fff;
+    font-weight: 800;
+    font-size: 92px;
     line-height: 1;
-    min-width: 110px;
-    text-align: center;
-    transition: transform .15s ease;
+    font-variant-numeric: tabular-nums;
   }
-  .red  .score { color: var(--red-soft);  text-shadow: 0 0 16px rgba(255, 45, 85, .7); }
-  .blue .score { color: var(--blue-soft); text-shadow: 0 0 16px rgba(30, 144, 255, .7); }
-  .score.bump { transform: scale(1.18); }
+  .red  .score { background: linear-gradient(180deg, var(--red) 0%, var(--red-dark) 100%); padding-left: 24px; }
+  .blue .score { background: linear-gradient(180deg, var(--blue) 0%, var(--blue-dark) 100%); padding-right: 24px; }
+  .score span { display: block; }
+  .score.bump span { animation: pop .35s cubic-bezier(.2, .8, .3, 1.2); }
+  .score::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .score.bump::after { animation: flash .4s ease-out; }
+  @keyframes pop   { from { transform: translateY(40%); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes flash { from { opacity: .45; } to { opacity: 0; } }
 
-  .names {
+  .plate {
+    position: relative;
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    justify-content: center;
+    gap: 2px;
+    padding: 0 32px;
+    background: linear-gradient(180deg, var(--plate-2) 0%, var(--plate) 100%);
   }
-  .red  .names { align-items: flex-end; text-align: right; }
-  .blue .names { align-items: flex-start; text-align: left; }
+  .plate::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 5px;
+  }
+  .red  .plate::after { background: var(--red); }
+  .blue .plate::after { background: var(--blue); }
+  .red  .plate { align-items: flex-end; text-align: right; }
+  .blue .plate { align-items: flex-start; text-align: left; }
 
   .name-he {
     direction: rtl;
+    font-family: "Heebo", sans-serif;
     font-weight: 900;
-    font-size: 50px;
-    line-height: 1.05;
+    font-size: 44px;
+    line-height: 1.1;
     color: #fff;
     white-space: nowrap;
   }
   .name-en {
-    font-weight: 800;
-    font-size: 22px;
-    letter-spacing: 2px;
-    color: #c9ccd6;
+    font-weight: 600;
+    font-size: 21px;
+    letter-spacing: 3px;
     text-transform: uppercase;
+    color: var(--muted);
     white-space: nowrap;
   }
 
-  /* ---------- center hexagon ---------- */
+  /* ---------- center ---------- */
   .center {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    height: 170px;
-    z-index: 2;
-  }
-  .hex, .hex-inner {
-    position: absolute;
-    clip-path: polygon(16% 0, 84% 0, 100% 50%, 84% 100%, 16% 100%, 0 50%);
-  }
-  .hex {
-    inset: 0;
-    background: linear-gradient(180deg, #ffd865, #b8871d);
-  }
-  .hex-inner {
-    inset: 5px 6px;
-    background: radial-gradient(ellipse at 50% 35%, #1b2550 0%, #0b1030 70%);
+    position: relative;
+    height: 128px;
+    background: var(--ink);
+    clip-path: polygon(0 0, 100% 0, 88% 100%, 12% 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
+    gap: 6px;
+    padding-top: 6px;
   }
-  .prize {
-    font-weight: 900;
-    font-size: 44px;
-    line-height: 1;
-    color: var(--gold);
-    text-shadow: 0 0 12px rgba(245, 197, 66, .6);
+  .center::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: var(--gold);
   }
   .vs {
-    font-family: "Rubik", sans-serif;
     font-style: italic;
-    font-weight: 900;
-    font-size: 64px;
-    line-height: 1;
+    font-weight: 800;
+    font-size: 58px;
+    line-height: .9;
+    letter-spacing: 1px;
     color: #fff;
-    text-shadow: -3px 0 0 var(--red), 3px 0 0 var(--blue), 0 0 14px rgba(255,255,255,.35);
+  }
+  .prize {
+    font-weight: 800;
+    font-size: 30px;
+    line-height: 1;
+    letter-spacing: 1px;
+    color: var(--ink);
+    background: var(--gold);
+    padding: 5px 18px 4px;
+    border-radius: 4px;
   }
 
-  /* ---------- help (hidden in OBS unless ?help) ---------- */
+  /* ---------- help (only with ?help) ---------- */
   .help {
     position: fixed;
-    bottom: 16px;
+    bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0,0,0,.8);
+    background: rgba(0, 0, 0, .8);
     color: #fff;
-    font-size: 16px;
+    font-family: "Heebo", sans-serif;
+    font-size: 15px;
     padding: 10px 18px;
-    border-radius: 10px;
+    border-radius: 8px;
     direction: rtl;
     display: none;
     text-align: center;
@@ -159,25 +171,22 @@
 <body>
 
 <div class="board">
-  <div class="side red" data-team="red">
-    <div class="score" id="score-red">0</div>
-    <div class="names">
+  <div class="team red" data-team="red">
+    <div class="score" id="score-red"><span>0</span></div>
+    <div class="plate">
       <div class="name-he">דוד טור</div>
       <div class="name-en">Devidtur</div>
     </div>
   </div>
 
   <div class="center">
-    <div class="hex"></div>
-    <div class="hex-inner">
-      <div class="prize">$15</div>
-      <div class="vs">VS</div>
-    </div>
+    <div class="vs">VS</div>
+    <div class="prize">$15</div>
   </div>
 
-  <div class="side blue" data-team="blue">
-    <div class="score" id="score-blue">0</div>
-    <div class="names">
+  <div class="team blue" data-team="blue">
+    <div class="score" id="score-blue"><span>0</span></div>
+    <div class="plate">
       <div class="name-he">מיכאל IGZ</div>
       <div class="name-en">IGZ</div>
     </div>
@@ -199,21 +208,24 @@
   function render(team) {
     for (const t of ["red", "blue"]) {
       const el = document.getElementById("score-" + t);
-      el.textContent = state[t];
+      el.firstElementChild.textContent = state[t];
       if (t === team) {
+        el.classList.remove("bump");
+        void el.offsetWidth;
         el.classList.add("bump");
-        setTimeout(() => el.classList.remove("bump"), 150);
       }
     }
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
   }
 
   function change(team, delta) {
-    state[team] = Math.max(0, state[team] + delta);
+    const next = Math.max(0, state[team] + delta);
+    if (next === state[team]) return;
+    state[team] = next;
     render(team);
   }
 
-  document.querySelectorAll(".side").forEach(side => {
+  document.querySelectorAll(".team").forEach(side => {
     const team = side.dataset.team;
     side.addEventListener("click", () => change(team, 1));
     side.addEventListener("contextmenu", e => { e.preventDefault(); change(team, -1); });
